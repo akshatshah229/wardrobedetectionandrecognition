@@ -99,7 +99,7 @@ def main():
     # Validation on Custom Images
     print("\n--- Validation on Custom Images ---")
     class_names = ['T-shirt/top','Trouser','Pullover','Dress','Coat','Sandal','Shirt','Sneaker','Bag','Ankle boot']
-    data_files = ['sneakers.jpg', 't-shirt.jpg', 'pullover.jpg', 'trousers.jpg', 'sandal.jpg']
+    data_files = ['test_bag.png', 'test_coat.png', 'test_dress.png']
     
     X_data = []
     rgb_weights = [0.2989, 0.5870, 0.1140]
@@ -112,20 +112,21 @@ def main():
             # Rotate (Notebook does this, so I will too)
             abc = cv2.rotate(abc, cv2.ROTATE_90_CLOCKWISE)
             # Grayscale
-            grayscale_image = np.dot(abc[...,:3], rgb_weights)
+            # Check if image has 4 channels (RGBA) or 3 (RGB)
+            if img.shape[2] == 4:
+                grayscale_image = np.dot(abc[...,:3], rgb_weights)
+            else:
+                grayscale_image = np.dot(abc[...,:3], rgb_weights)
             X_data.append(grayscale_image)
         except Exception as e:
             print(f"Error processing {file}: {e}")
             return
 
     X_data = np.array(X_data)
-    X_validate = X_data.reshape(5, 28*28)
+    X_validate = X_data.reshape(3, 28*28)
     
-    # Notebook validation labels: [7, 0, 6, 1, 9] -> Sneaker, T-shirt, Shirt, Trouser, Ankle boot
-    # Note: 'pullover.jpg' is labeled as 6 (Shirt) in notebook, but file is pullover? 
-    # Pullover is index 2. Shirt is index 6. 
-    # Let's stick to notebook logic.
-    y_validate = np.array([7, 0, 6, 1, 9]) 
+    # New labels: Bag (8), Coat (4), Dress (3)
+    y_validate = np.array([8, 4, 3]) 
 
     print("Predicting on custom images using best SVM model...")
     # SVM model in notebook was trained on PCA data. 
